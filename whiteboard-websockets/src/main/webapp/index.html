@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Testing websockets</title>
+</head>
+<body>
+	<div>
+		<span>Desc:</span>
+		<input id="desc" type="text" />
+		<br />
+		<span>color:</span>
+		<input id="color" type="text" />
+	</div>
+	<div>
+		<input type="submit" value="Send message" onclick="send()" />
+	</div>
+	<div id="messages"></div>
+	<script type="text/javascript">
+		var port= "";
+		var webSocket = 
+			new WebSocket('ws://' + window.location.host + port + window.location.pathname +'websocket');
+
+		webSocket.onerror = function(event) {
+			onError(event);
+		};
+
+		webSocket.onopen = function(event) {
+			onOpen(event);
+		};
+
+		webSocket.onmessage = function(event) {
+			onMessage(event);
+		};
+
+		function onMessage(event) {
+			var json = JSON.parse(event.data);
+			console.log(json);
+			
+			var i;
+			for (i = 0; i < json.length; i++) { 
+
+			    document.getElementById('messages').innerHTML 
+				+= '<br /><br />Received server response!'
+				+ '<br />desc: ' + json[i].desc
+				+ '<br />color: ' + json[i].color;
+			}
+		}
+
+		function onOpen(event) {
+			alert('Connection established');
+			
+		}
+
+		function onError(event) {
+			alert('Error');
+		}
+
+		function send() {
+			var desc = document.getElementById('desc').value;
+			var color = document.getElementById('color').value;
+			var json = { 
+				'desc' : desc,
+				'color' : color
+			};
+			webSocket.send(JSON.stringify(json));
+			return false;
+		}
+	</script>
+</body>
+</html>
